@@ -56,6 +56,10 @@ const Game = {
     this.narrative.innerHTML += text + '\n';
   },
 
+  separator() {
+    return '='.repeat(window.innerWidth < 600 ? 26 : 40);
+  },
+
   printLines(lines) {
     this.narrative.innerHTML += lines.join('\n') + '\n';
   },
@@ -96,12 +100,10 @@ const Game = {
       ? ' | <span class="warning">' + this.weatherLabel() + '</span>' : '';
 
     this.statusBar.innerHTML =
-      `<span>${this.state.day}, ${this.state.month} ${this.state.year}</span> | ` +
-      `Time: <span class="${this.state.time.hour >= 17 ? 'warning' : ''}">${timeStr}</span>${weatherTag} | ` +
-      `Masks: ${r.masks} | Sanitizer: ${r.sanitizer} | TP: ${r.toiletPaper} | ` +
-      `Phone: ${r.phoneBattery}% | Patience: ${r.patience}% | ` +
-      `$${r.cash} | Errands: ${errandsDone}/5<br>` +
-      `Party: ${partyStr}`;
+      `<span class="stat-row">${this.state.day}, ${this.state.month} ${this.state.year} | Time: <span class="${this.state.time.hour >= 17 ? 'warning' : ''}">${timeStr}</span>${weatherTag}</span> ` +
+      `<span class="stat-row">Masks: ${r.masks} | Sanitizer: ${r.sanitizer} | TP: ${r.toiletPaper}</span> ` +
+      `<span class="stat-row">Phone: ${r.phoneBattery}% | Patience: ${r.patience}% | $${r.cash} | Errands: ${errandsDone}/5</span> ` +
+      `<span class="stat-row">Party: ${partyStr}</span>`;
   },
 
   weatherLabel() {
@@ -339,9 +341,9 @@ const Game = {
 
       case 'death':
         event.members.forEach(m => {
-          this.print('<span class="danger">========================================</span>');
+          this.print(`<span class="danger">${this.separator()}</span>`);
           this.print(`<span class="danger">  ${m.name} ${m.causeOfDeath}.</span>`);
-          this.print('<span class="danger">========================================</span>');
+          this.print(`<span class="danger">${this.separator()}</span>`);
           this.print('');
         });
 
@@ -362,10 +364,10 @@ const Game = {
 
   showTitle() {
     this.clear();
-    this.print('<span class="title">========================================</span>');
-    this.print('<span class="title">        T H E   C O V I D</span>');
-    this.print('<span class="title">            T R A I L</span>');
-    this.print('<span class="title">========================================</span>');
+    this.print(`<span class="title">${this.separator()}</span>`);
+    this.print('<span class="title">T H E   C O V I D</span>');
+    this.print('<span class="title">T R A I L</span>');
+    this.print(`<span class="title">${this.separator()}</span>`);
     this.print('');
     this.print('<span class="subtitle">An Oregon Trail Parody</span>');
     this.print('<span class="subtitle">"The Errand Run" -- Definitive Edition</span>');
@@ -550,8 +552,8 @@ const Game = {
 
     const transportMsg = {
       car: 'You grab your keys, triple-check your mask, and head to the car.',
-      transit: 'You check the bus schedule app. It says 8 minutes.\nIt has said 8 minutes for 20 minutes.',
-      bike: 'You strap on your helmet, attach the panniers, and realize\nyou can only carry about 4 items total across all errands.'
+      transit: 'You check the bus schedule app. It says 8 minutes. It has said 8 minutes for 20 minutes.',
+      bike: 'You strap on your helmet, attach the panniers, and realize you can only carry about 4 items total across all errands.'
     };
 
     this.print(transportMsg[this.state.transport]);
@@ -624,63 +626,63 @@ const Game = {
     const events = {
       rainy: {
         title: 'RAIN -- Your Mask Is Dissolving',
-        description: 'It\'s raining. Your surgical mask is absorbing\nwater like a sponge. Every breath feels like\nyou\'re waterboarding yourself.',
+        description: 'It\'s raining. Your surgical mask is absorbing water like a sponge. Every breath feels like you\'re waterboarding yourself.',
         choices: [
           {
             text: 'Swap to a fresh mask',
-            result: 'You fumble in the rain, trying to swap masks\nwithout touching your face. You touch your\nface. You use sanitizer. Everything is wet.',
+            result: 'You fumble in the rain, trying to swap masks without touching your face. You touch your face. You use sanitizer. Everything is wet.',
             effect: () => { this.degradeMask(); this.useSanitizer(); }
           },
           {
             text: 'Push through with the wet mask',
-            result: 'You breathe through what is essentially a wet\nrag for the next 10 minutes. A new low,\neven for 2020.',
+            result: 'You breathe through what is essentially a wet rag for the next 10 minutes. A new low, even for 2020.',
             effect: () => { this.loseWillpower(10); this.damageAllParty(5); }
           },
           {
             text: 'Wait under an awning',
-            result: 'You huddle under a closed store\'s awning.\nThree other people join you. So much for\ndistancing. At least you\'re dry.',
+            result: 'You huddle under a closed store\'s awning. Three other people join you. So much for distancing. At least you\'re dry.',
             effect: () => { this.advanceTime(10); this.addExposure(10); }
           }
         ]
       },
       hot: {
         title: 'HEATWAVE -- Mask Becomes Face Sauna',
-        description: 'It\'s unseasonably warm. Your mask has become\na portable sauna for your face. Your glasses\nare fogged. You can see nothing.',
+        description: 'It\'s unseasonably warm. Your mask has become a portable sauna for your face. Your glasses are fogged. You can see nothing.',
         choices: [
           {
             text: 'Remove glasses, navigate blind',
-            result: 'You pocket your glasses and squint.\nEverything is blurry. You walk into\na sandwich board sign. It hurts.',
+            result: 'You pocket your glasses and squint. Everything is blurry. You walk into a sandwich board sign. It hurts.',
             effect: () => { this.damagePartyMember(this.state.party[0], 5); this.loseWillpower(5); }
           },
           {
             text: 'Lower mask briefly to defog',
-            result: 'You pull the mask down for 3 seconds.\nA jogger sees you and gives you THE look.\nYou pull it back up.',
+            result: 'You pull the mask down for 3 seconds. A jogger sees you and gives you THE look. You pull it back up.',
             effect: () => { this.addExposure(8); this.loseWillpower(8); }
           },
           {
             text: 'Use sanitizer on lenses (internet hack)',
-            result: 'You remember a tip from the internet.\nYou use hand sanitizer on your lenses.\nIt... kind of works. Your eyes sting.',
+            result: 'You remember a tip from the internet. You use hand sanitizer on your lenses. It... kind of works. Your eyes sting.',
             effect: () => { this.useSanitizer(); this.advanceTime(3); }
           }
         ]
       },
       windy: {
         title: 'WIND ADVISORY -- Mask In Peril',
-        description: 'A gust of wind catches your mask and pulls\nit off one ear. It flaps from your face\nlike a tiny surrender flag.',
+        description: 'A gust of wind catches your mask and pulls it off one ear. It flaps from your face like a tiny surrender flag.',
         choices: [
           {
             text: 'Secure it and push forward',
-            result: 'The mask holds. Barely. You walk hunched\nagainst the wind like a pandemic Quasimodo.',
+            result: 'The mask holds. Barely. You walk hunched against the wind like a pandemic Quasimodo.',
             effect: () => { this.loseWillpower(5); }
           },
           {
             text: 'Use a fresh mask, tie it tighter',
-            result: 'You burn a mask but at least this one\nwon\'t fly off. It\'s so tight you can feel\nyour pulse in your ears.',
+            result: 'You burn a mask but at least this one won\'t fly off. It\'s so tight you can feel your pulse in your ears.',
             effect: () => { this.degradeMask(); this.degradeMask(); }
           },
           {
             text: 'Fashion a mask from your scarf',
-            result: 'You MacGyver a face covering from your scarf.\nIt smells like the back of your closet.\nBut it holds against the wind.',
+            result: 'You MacGyver a face covering from your scarf. It smells like the back of your closet. But it holds against the wind.',
             effect: () => { this.advanceTime(5); }
           }
         ]
@@ -719,7 +721,7 @@ const Game = {
     const crossings = [
       {
         title: 'CROWD CROSSING -- Packed Sidewalk',
-        description: 'The sidewalk ahead narrows between construction\nbarriers. A crowd has formed -- approximately 20\npeople crammed into a space meant for 4.\nNo distancing. No order. Pure chaos.',
+        description: 'The sidewalk ahead narrows between construction barriers. A crowd has formed -- approximately 20 people crammed into a space meant for 4. No distancing. No order. Pure chaos.',
         ford: {
           text: 'Push through the crowd (fast, risky)',
           effect: () => {
@@ -772,7 +774,7 @@ const Game = {
       },
       {
         title: 'CROWD CROSSING -- Farmer\'s Market',
-        description: 'A farmer\'s market has materialized in the street.\nHundreds of people browsing artisanal soap and\n$9 tomatoes. Your route goes directly through it.\nMask compliance: approximately 60%.',
+        description: 'A farmer\'s market has materialized in the street. Hundreds of people browsing artisanal soap and $9 tomatoes. Your route goes directly through it. Mask compliance: approximately 60%.',
         ford: {
           text: 'Cut through the market (fast, high exposure)',
           effect: () => {
@@ -825,7 +827,7 @@ const Game = {
       },
       {
         title: 'CROWD CROSSING -- Anti-Mask Protest',
-        description: 'A group of approximately 30 people are blocking\nthe intersection, holding signs about "freedom"\nand "breathing rights." None are wearing masks.\nA man has a megaphone.',
+        description: 'A group of approximately 30 people are blocking the intersection, holding signs about "freedom" and "breathing rights." None are wearing masks. A man has a megaphone.',
         ford: {
           text: 'Walk directly through (brave/foolish)',
           effect: () => {
@@ -884,7 +886,7 @@ const Game = {
       },
       {
         title: 'CROWD CROSSING -- School Pickup Gauntlet',
-        description: 'A hybrid-schedule school just let out. Parents\nin SUVs triple-parked everywhere. Children scatter\nlike startled birds. Crossing guards look shell-shocked.\nThe intersection is total gridlock.',
+        description: 'A hybrid-schedule school just let out. Parents in SUVs triple-parked everywhere. Children scatter like startled birds. Crossing guards look shell-shocked. The intersection is total gridlock.',
         ford: {
           text: 'Weave through the chaos',
           effect: () => {
@@ -1003,85 +1005,85 @@ const Game = {
       // ── ORIGINAL EVENTS ──
       {
         title: 'ROAD BLOCKED -- Outdoor Dining Expansion',
-        description: 'The entire street is now a restaurant patio.\nPlastic barriers and heat lamps block all lanes.\nA waiter glares at you for existing near his tables.',
+        description: 'The entire street is now a restaurant patio. Plastic barriers and heat lamps block all lanes. A waiter glares at you for existing near his tables.',
         choices: [
           {
             text: 'Detour (adds 10 minutes)',
-            result: 'You weave through side streets. A one-way\nsystem that didn\'t exist last month confuses you.',
+            result: 'You weave through side streets. A one-way system that didn\'t exist last month confuses you.',
             effect: () => { this.advanceTime(10); }
           },
           {
             text: 'Pass through slowly, accepting the judgment',
-            result: 'The waiter shakes his head. A diner looks up\nfrom their bottomless mimosa with pity.',
+            result: 'The waiter shakes his head. A diner looks up from their bottomless mimosa with pity.',
             effect: () => { this.advanceTime(5); this.loseWillpower(5); }
           }
         ]
       },
       {
         title: 'ENCOUNTER -- Person You Vaguely Know',
-        description: 'Someone from your pre-COVID life is approaching\non the sidewalk. You can\'t tell if they recognize\nyou through the mask. The social calculus begins.',
+        description: 'Someone from your pre-COVID life is approaching on the sidewalk. You can\'t tell if they recognize you through the mask. The social calculus begins.',
         choices: [
           {
             text: 'Wave and keep moving',
-            result: 'They wave back. Or they were swatting a fly.\nEither way, interaction complete. You\'ll analyze\nthis for 20 minutes later.',
+            result: 'They wave back. Or they were swatting a fly. Either way, interaction complete. You\'ll analyze this for 20 minutes later.',
             effect: () => { this.advanceTime(2); }
           },
           {
             text: 'Stop and chat (from 6 feet)',
-            result: '"So... how have you BEEN?" The conversation\nlasts 8 minutes and covers nothing. You both\nsay "we should hang out" knowing you won\'t.',
+            result: '"So... how have you BEEN?" The conversation lasts 8 minutes and covers nothing. You both say "we should hang out" knowing you won\'t.',
             effect: () => { this.advanceTime(12); this.losePatience(5); this.addExposure(5); }
           },
           {
             text: 'Pretend to check your phone',
-            result: 'You stare at your phone intensely. They walk\npast. Did they notice? Do they hate you now?\nDoes it matter? Everything is different.',
+            result: 'You stare at your phone intensely. They walk past. Did they notice? Do they hate you now? Does it matter? Everything is different.',
             effect: () => { this.drainBattery(5); this.loseWillpower(3); }
           }
         ]
       },
       {
         title: 'SUPPLY CHECK -- Mask Situation',
-        description: 'Your mask is getting damp from breathing.\nThe ear loops are stretching. You\'re not sure\nif the one in your pocket is clean or the one\nyou wore to the grocery store three days ago.',
+        description: 'Your mask is getting damp from breathing. The ear loops are stretching. You\'re not sure if the one in your pocket is clean or the one you wore to the grocery store three days ago.',
         choices: [
           {
             text: 'Swap to the pocket mask (risky)',
-            result: 'You sniff it cautiously. It smells like... pocket.\nGood enough. Probably.',
+            result: 'You sniff it cautiously. It smells like... pocket. Good enough. Probably.',
             effect: () => { this.addExposure(3); }
           },
           {
             text: 'Use a fresh mask from your supply',
-            result: 'The crisp feeling of a new mask. The brief\nmoment of easy breathing before it, too,\nbecomes a damp face prison.',
+            result: 'The crisp feeling of a new mask. The brief moment of easy breathing before it, too, becomes a damp face prison.',
             effect: () => { this.degradeMask(); }
           }
         ]
       },
       {
         title: 'CLOSED STOREFRONT',
-        description: 'You pass another shuttered business. The sign\nstill says "Closed temporarily - see you soon!"\nThe sign is sun-bleached. It\'s been 7 months.',
+        description: 'You pass another shuttered business. The sign still says "Closed temporarily - see you soon!" The sign is sun-bleached. It\'s been 7 months.',
         choices: [
           {
             text: 'Feel a pang of sadness, keep moving',
-            result: 'You remember getting coffee there. The barista\nknew your order. You wonder where she is now.',
+            result: 'You remember getting coffee there. The barista knew your order. You wonder where she is now.',
             effect: () => { this.loseWillpower(5); }
           },
           {
             text: 'Take a photo for some reason',
-            result: 'You\'re not sure why. Documentation? Nostalgia?\nYour camera roll is increasingly bleak.',
+            result: 'You\'re not sure why. Documentation? Nostalgia? Your camera roll is increasingly bleak.',
             effect: () => { this.drainBattery(3); this.advanceTime(2); }
           }
         ]
       },
       {
         title: 'NOTIFICATION -- Screen Time Report',
-        description: 'Your phone buzzes. Weekly screen time report:\n"Your screen time was up 47% last week."\nAverage: 6 hours 23 minutes per day.',
+        description: 'Your phone buzzes. Weekly screen time report: "Your screen time was up 47% last week." Average: 6 hours 23 minutes per day.',
         choices: [
           {
             text: 'Dismiss without reading',
-            result: 'You swipe it away. The number lingers\nin your mind like a ghost.',
+            result: 'You swipe it away. The number lingers in your mind like a ghost.',
             effect: () => { this.loseWillpower(3); }
           },
           {
             text: 'Open it, spiral briefly',
-            result: '"Most used: Twitter - 2h 14m daily."\nYou close your phone with the energy\nof someone closing a casket.',
+            result: '"Most used: Twitter - 2h 14m daily." You close your phone with the energy of someone closing a casket.',
             effect: () => { this.drainBattery(5); this.loseWillpower(8); this.advanceTime(3); }
           }
         ]
@@ -1090,11 +1092,11 @@ const Game = {
       // ── EQUIPMENT FAILURES ──
       {
         title: 'EQUIPMENT FAILURE -- Mask Ear Loop Snaps',
-        description: 'POP. Your mask\'s ear loop just gave out.\nThe mask dangles from one ear like a tiny\nsurrender flag. You are exposed to the world.',
+        description: 'POP. Your mask\'s ear loop just gave out. The mask dangles from one ear like a tiny surrender flag. You are exposed to the world.',
         choices: [
           {
             text: 'Deploy a backup mask',
-            result: 'You waste a mask, but dignity is preserved.\nThe broken one goes in your pocket where it\nwill live for the next 6 months.',
+            result: 'You waste a mask, but dignity is preserved. The broken one goes in your pocket where it will live for the next 6 months.',
             effect: () => {
               this.state.resources.masks = Math.max(0, this.state.resources.masks - 1);
               if (this.state.resources.masks <= 0) this.addExposure(15);
@@ -1102,23 +1104,23 @@ const Game = {
           },
           {
             text: 'Tie the broken loop in a knot',
-            result: 'You tie it. It works, barely. The mask sits\nat a 15-degree angle on your face. You look\nlike a pandemic pirate.',
+            result: 'You tie it. It works, barely. The mask sits at a 15-degree angle on your face. You look like a pandemic pirate.',
             effect: () => { this.advanceTime(3); this.addExposure(5); }
           },
           {
             text: 'Hold it to your face with your hand',
-            result: 'You walk with one hand on your face for\nthe next 10 minutes. You can\'t open doors.\nYou can\'t check your phone. This is misery.',
+            result: 'You walk with one hand on your face for the next 10 minutes. You can\'t open doors. You can\'t check your phone. This is misery.',
             effect: () => { this.losePatience(10); this.advanceTime(5); }
           }
         ]
       },
       {
         title: 'EQUIPMENT FAILURE -- Sanitizer Leak',
-        description: 'Your hand sanitizer has leaked inside your bag.\nEverything is sticky. Your phone case is coated.\nThe receipt you needed is now a translucent gel wafer.',
+        description: 'Your hand sanitizer has leaked inside your bag. Everything is sticky. Your phone case is coated. The receipt you needed is now a translucent gel wafer.',
         choices: [
           {
             text: 'Salvage what you can',
-            result: 'You recover about half the sanitizer.\nEverything you own smells like a hospital\nfor the rest of the day.',
+            result: 'You recover about half the sanitizer. Everything you own smells like a hospital for the rest of the day.',
             effect: () => {
               this.state.resources.sanitizer = Math.max(0, this.state.resources.sanitizer - 3);
               this.advanceTime(5);
@@ -1126,7 +1128,7 @@ const Game = {
           },
           {
             text: 'Wipe everything down and move on',
-            result: 'You use the leaked sanitizer to clean your\nphone, keys, and wallet. Efficient, in a\nchaotic sort of way.',
+            result: 'You use the leaked sanitizer to clean your phone, keys, and wallet. Efficient, in a chaotic sort of way.',
             effect: () => {
               this.state.resources.sanitizer = Math.max(0, this.state.resources.sanitizer - 2);
             }
@@ -1137,18 +1139,18 @@ const Game = {
       // ── THEFT / LOSS EVENTS ──
       {
         title: 'SUPPLY LOSS -- Bag Fumble',
-        description: 'You\'re juggling your phone, keys, sanitizer,\nand shopping list. Something has to give.\nPhysics makes the choice for you.',
+        description: 'You\'re juggling your phone, keys, sanitizer, and shopping list. Something has to give. Physics makes the choice for you.',
         choices: [
           {
             text: 'Grab the phone (sacrifice the sanitizer)',
-            result: 'Your sanitizer bounces off the curb and rolls\ninto a storm drain. It\'s gone. Just... gone.\nYou stare at the drain for a moment too long.',
+            result: 'Your sanitizer bounces off the curb and rolls into a storm drain. It\'s gone. Just... gone. You stare at the drain for a moment too long.',
             effect: () => {
               this.state.resources.sanitizer = Math.max(0, this.state.resources.sanitizer - 2);
             }
           },
           {
             text: 'Grab the sanitizer (risk the phone)',
-            result: 'You save the sanitizer! Your phone hits the\nground screen-first. The screen protector\ntakes the hit. This time.',
+            result: 'You save the sanitizer! Your phone hits the ground screen-first. The screen protector takes the hit. This time.',
             effect: () => { this.drainBattery(10); this.advanceTime(2); }
           },
           {
@@ -1174,7 +1176,7 @@ const Game = {
       },
       {
         title: 'SUPPLY LOSS -- Toilet Paper Heist',
-        description: 'You set your bag down for ONE SECOND to check\nyour phone. When you look back, someone has taken\nyour toilet paper out of the bag. In broad daylight.\nThey\'re speed-walking away clutching YOUR Charmin.',
+        description: 'You set your bag down for ONE SECOND to check your phone. When you look back, someone has taken your toilet paper out of the bag. In broad daylight. They\'re speed-walking away clutching YOUR Charmin.',
         choices: [
           {
             text: 'Chase them down',
@@ -1196,7 +1198,7 @@ const Game = {
           },
           {
             text: 'Let them have it. Pick your battles.',
-            result: 'You watch them go. In 2020, toilet paper is\ncurrency. You just got mugged.',
+            result: 'You watch them go. In 2020, toilet paper is currency. You just got mugged.',
             effect: () => {
               this.state.resources.toiletPaper = Math.max(0, this.state.resources.toiletPaper - 2);
               this.loseWillpower(8);
@@ -1208,11 +1210,11 @@ const Game = {
       // ── POSITIVE EVENTS ──
       {
         title: 'MIRACLE -- Short Line',
-        description: 'You walk past a store. No line. Empty entrance.\nA parking spot right in front. The employee\nwaves pleasantly. Is this real? Am I dreaming?',
+        description: 'You walk past a store. No line. Empty entrance. A parking spot right in front. The employee waves pleasantly. Is this real? Am I dreaming?',
         choices: [
           {
             text: 'Accept this gift from the universe',
-            result: 'You take a deep breath (through your mask).\nNot everything is terrible. Some things are\nfine. Today, this one thing is fine.',
+            result: 'You take a deep breath (through your mask). Not everything is terrible. Some things are fine. Today, this one thing is fine.',
             effect: () => {
               this.state.resources.willpower = Math.min(100, this.state.resources.willpower + 10);
               this.state.resources.patience = Math.min(100, this.state.resources.patience + 5);
@@ -1223,7 +1225,7 @@ const Game = {
       },
       {
         title: 'FOUND -- Masks On Sale',
-        description: 'A convenience store has a hand-written sign:\n"MASKS - $2/pack - LIMIT 2".\nThis is like finding water in the desert.',
+        description: 'A convenience store has a hand-written sign: "MASKS - $2/pack - LIMIT 2". This is like finding water in the desert.',
         choices: [
           {
             text: 'Buy masks ($4)',
@@ -1245,18 +1247,18 @@ const Game = {
           },
           {
             text: 'Pass (you\'re fine on masks)',
-            result: 'You walk past. Pride intact.\n...You\'ll probably regret this.',
+            result: 'You walk past. Pride intact. ...You\'ll probably regret this.',
             effect: () => { }
           }
         ]
       },
       {
         title: 'KINDNESS -- Stranger Holds the Door',
-        description: 'A stranger in the parking lot sees you struggling\nwith bags, mask, phone, and keys. They hold\nthe door from 8 feet away with their foot.',
+        description: 'A stranger in the parking lot sees you struggling with bags, mask, phone, and keys. They hold the door from 8 feet away with their foot.',
         choices: [
           {
             text: '"Thank you so much"',
-            result: '"No problem! We\'re all in this together."\nFor once, it doesn\'t sound hollow.\nYour faith in humanity ticks up slightly.',
+            result: '"No problem! We\'re all in this together." For once, it doesn\'t sound hollow. Your faith in humanity ticks up slightly.',
             effect: () => {
               this.state.resources.willpower = Math.min(100, this.state.resources.willpower + 8);
               this.getAliveParty().forEach(p => this.healPartyMember(p, 3));
@@ -1266,16 +1268,16 @@ const Game = {
       },
       {
         title: 'FOUND -- $10 Bill',
-        description: 'There\'s a $10 bill on the sidewalk.\nCrumpled, slightly damp, clearly dropped.\nYou look around. Nobody is searching.',
+        description: 'There\'s a $10 bill on the sidewalk. Crumpled, slightly damp, clearly dropped. You look around. Nobody is searching.',
         choices: [
           {
             text: 'Pick it up (use sanitizer after)',
-            result: 'You pocket the bill and immediately sanitize.\nThe thrill of found money in a pandemic\nis genuinely the highlight of your month.',
+            result: 'You pocket the bill and immediately sanitize. The thrill of found money in a pandemic is genuinely the highlight of your month.',
             effect: () => { this.state.resources.cash += 10; this.useSanitizer(); }
           },
           {
             text: 'Leave it. Who knows where it\'s been.',
-            result: 'You walk past a perfectly good $10 bill\nbecause of germs. This is your life now.',
+            result: 'You walk past a perfectly good $10 bill because of germs. This is your life now.',
             effect: () => { this.loseWillpower(3); }
           }
         ]
@@ -1284,20 +1286,20 @@ const Game = {
       // ── NPC RUMORS / INTEL ──
       {
         title: 'INTEL -- Overheard in Line',
-        description: 'The person ahead of you is on the phone.\nYou can\'t help but overhear...',
+        description: 'The person ahead of you is on the phone. You can\'t help but overhear...',
         choices: [
           {
             text: 'Eavesdrop (might be useful)',
             result: '',
             effect: () => {
               const rumors = [
-                '"...yeah the Walgreens on 5th closed their\npharmacy early today. Just don\'t even bother..."',
-                '"...I heard Costco has toilet paper again\nbut you have to go before 10..."',
-                '"...the bank is doing walk-ins now, you don\'t\nneed an appointment, the guard is just bored..."',
-                '"...they rearranged the grocery store AGAIN.\nNothing is where it was last week..."',
-                '"...the hardware store has N95s at the register.\nThey don\'t advertise it, just ask..."',
-                '"...my cousin got tested and it took NINE\nDAYS for results. Nine. What is the point..."',
-                '"...apparently you can use a bandana now?\nThe CDC changed the guidance again..."'
+                '"...yeah the Walgreens on 5th closed their pharmacy early today. Just don\'t even bother..."',
+                '"...I heard Costco has toilet paper again but you have to go before 10..."',
+                '"...the bank is doing walk-ins now, you don\'t need an appointment, the guard is just bored..."',
+                '"...they rearranged the grocery store AGAIN. Nothing is where it was last week..."',
+                '"...the hardware store has N95s at the register. They don\'t advertise it, just ask..."',
+                '"...my cousin got tested and it took NINE DAYS for results. Nine. What is the point..."',
+                '"...apparently you can use a bandana now? The CDC changed the guidance again..."'
               ];
               this.print(this.random(rumors));
               this.print('');
@@ -1307,23 +1309,23 @@ const Game = {
           },
           {
             text: 'Mind your own business',
-            result: 'You stare at your phone instead. You\'ll never\nknow what intelligence you missed.',
+            result: 'You stare at your phone instead. You\'ll never know what intelligence you missed.',
             effect: () => { this.drainBattery(3); }
           }
         ]
       },
       {
         title: 'ENCOUNTER -- Conspiracy Theorist',
-        description: 'A man on the corner is explaining to nobody\nin particular that COVID was created by [redacted]\nto [redacted] the [redacted]. He has a megaphone.\nIt\'s 10 AM on a Saturday.',
+        description: 'A man on the corner is explaining to nobody in particular that COVID was created by [redacted] to [redacted] the [redacted]. He has a megaphone. It\'s 10 AM on a Saturday.',
         choices: [
           {
             text: 'Walk past, eyes forward',
-            result: 'He shouts something about microchips.\nYou keep walking. This is fine.',
+            result: 'He shouts something about microchips. You keep walking. This is fine.',
             effect: () => { this.loseWillpower(5); this.addExposure(3); }
           },
           {
             text: 'Cross the street to avoid',
-            result: 'You cross the street. From here, the megaphone\nis just background noise. Like everything else\nthat doesn\'t make sense anymore.',
+            result: 'You cross the street. From here, the megaphone is just background noise. Like everything else that doesn\'t make sense anymore.',
             effect: () => { this.advanceTime(2); }
           }
         ]
@@ -1335,42 +1337,42 @@ const Game = {
     if (hasKids) {
       events.push({
         title: 'CHILD STATUS -- Meltdown Incoming',
-        description: '"I\'m BORED." "I\'m HUNGRY." "I need to PEE."\nThe small ones are deteriorating. You have\nbeen out for ' + (this.state.time.hour - 8) + ' hour(s).',
+        description: '"I\'m BORED." "I\'m HUNGRY." "I need to PEE." The small ones are deteriorating. You have been out for ' + (this.state.time.hour - 8) + ' hour(s).',
         choices: [
           {
             text: 'Promise a treat later (buy time)',
-            result: '"If you\'re good for the next stop, we\'ll get\na donut." You have purchased 20 minutes\nof peace with a future obligation.',
+            result: '"If you\'re good for the next stop, we\'ll get a donut." You have purchased 20 minutes of peace with a future obligation.',
             effect: () => { this.advanceTime(2); this.state.resources.cash -= 5; }
           },
           {
             text: 'Hand them your phone',
-            result: 'Silence. Beautiful silence. Your phone\nbattery enters freefall.',
+            result: 'Silence. Beautiful silence. Your phone battery enters freefall.',
             effect: () => { this.drainBattery(20); }
           },
           {
             text: 'Lecture about patience (backfires)',
-            result: '"When I was your age--" You hear yourself\nbecoming your parents. The children do not\ncare. Patience drops for everyone.',
+            result: '"When I was your age--" You hear yourself becoming your parents. The children do not care. Patience drops for everyone.',
             effect: () => { this.losePatience(15); this.advanceTime(5); }
           }
         ]
       });
       events.push({
         title: 'CHILD STATUS -- Mask Rebellion',
-        description: 'Kid (5) has removed their mask for the 4th time.\n"It\'s ITCHY." "I can\'t BREATHE." "It smells\nlike my FACE."',
+        description: 'Kid (5) has removed their mask for the 4th time. "It\'s ITCHY." "I can\'t BREATHE." "It smells like my FACE."',
         choices: [
           {
             text: 'Calmly re-mask the child',
-            result: 'You kneel down, fix the mask, and say\n"I know, buddy." The mask lasts approximately\n90 seconds before the next complaint.',
+            result: 'You kneel down, fix the mask, and say "I know, buddy." The mask lasts approximately 90 seconds before the next complaint.',
             effect: () => { this.losePatience(8); this.advanceTime(3); }
           },
           {
             text: 'Bribe with screen time',
-            result: '"Keep your mask on, you can watch YouTube\nin the car." The mask stays on.\nYou are a negotiation genius.',
+            result: '"Keep your mask on, you can watch YouTube in the car." The mask stays on. You are a negotiation genius.',
             effect: () => { this.drainBattery(5); }
           },
           {
             text: 'Let them go maskless briefly (outside)',
-            result: 'You let them breathe for a minute. An older\nwoman shoots you a look that could curdle milk.\nYou re-mask the child immediately.',
+            result: 'You let them breathe for a minute. An older woman shoots you a look that could curdle milk. You re-mask the child immediately.',
             effect: () => { this.addExposure(8); this.loseWillpower(8); }
           }
         ]
@@ -1380,21 +1382,21 @@ const Game = {
     if (hasSpouse) {
       events.push({
         title: 'SPOUSE STATUS -- "Helpful" Suggestion',
-        description: 'Spouse looks at the route and says:\n"You know, if we had just gone to the pharmacy\nFIRST, we wouldn\'t be in this situation."',
+        description: 'Spouse looks at the route and says: "You know, if we had just gone to the pharmacy FIRST, we wouldn\'t be in this situation."',
         choices: [
           {
             text: '"You\'re right." (lie for peace)',
-            result: 'Spouse nods, satisfied. You stare out the\nwindow and think about the ocean.',
+            result: 'Spouse nods, satisfied. You stare out the window and think about the ocean.',
             effect: () => { this.loseWillpower(5); }
           },
           {
             text: '"I planned the route carefully."',
-            result: '"Did you though?" A silence descends.\nIt will last 1.3 errands.',
+            result: '"Did you though?" A silence descends. It will last 1.3 errands.',
             effect: () => { this.losePatience(8); this.loseWillpower(3); }
           },
           {
             text: '"You\'re welcome to drive next time."',
-            result: 'Spouse makes a face you can\'t see behind\ntheir mask but can FEEL in your bones.\nThe temperature in the car drops 4 degrees.',
+            result: 'Spouse makes a face you can\'t see behind their mask but can FEEL in your bones. The temperature in the car drops 4 degrees.',
             effect: () => { this.losePatience(10); this.loseWillpower(5); }
           }
         ]
@@ -1404,23 +1406,23 @@ const Game = {
     if (carOnly) {
       events.push({
         title: 'PARKING -- The Lot is Full',
-        description: 'Capacity limits mean fewer people inside\nbut more cars circling the lot like vultures.\nA spot opens. Someone else is closer.',
+        description: 'Capacity limits mean fewer people inside but more cars circling the lot like vultures. A spot opens. Someone else is closer.',
         choices: [
           {
             text: 'Circle the lot (burn time)',
-            result: 'Three loops. Finally, a spot opens in\nthe far corner, next to a cart return\nthat no one uses.',
+            result: 'Three loops. Finally, a spot opens in the far corner, next to a cart return that no one uses.',
             effect: () => { this.advanceTime(8); }
           },
           {
             text: 'Park on the street two blocks away',
-            result: 'The walk isn\'t bad. The parking meter\nonly takes an app now. The app needs\nan update. The update needs WiFi.',
+            result: 'The walk isn\'t bad. The parking meter only takes an app now. The app needs an update. The update needs WiFi.',
             effect: () => { this.advanceTime(5); this.drainBattery(8); this.losePatience(5); }
           }
         ]
       });
       events.push({
         title: 'EQUIPMENT FAILURE -- Car Won\'t Start',
-        description: 'You turn the key. Click. Click. Click.\nThe engine doesn\'t turn over. The battery\nis dead. Of course it is. You\'ve barely\ndriven in 7 months.',
+        description: 'You turn the key. Click. Click. Click. The engine doesn\'t turn over. The battery is dead. Of course it is. You\'ve barely driven in 7 months.',
         choices: [
           {
             text: 'Try again. And again. And again.',
@@ -1469,16 +1471,16 @@ const Game = {
     if (transitOnly) {
       events.push({
         title: 'BUS SITUATION',
-        description: 'The bus arrives. Through the window you can\nsee it\'s... not empty. The driver\'s mask is\nbelow his nose. A man in back is coughing.',
+        description: 'The bus arrives. Through the window you can see it\'s... not empty. The driver\'s mask is below his nose. A man in back is coughing.',
         choices: [
           {
             text: 'Board and stand near the door',
-            result: 'You press against the door like you\'re\ntrying to phase through it. Every stop\nyou briefly taste fresh air like a prisoner.',
+            result: 'You press against the door like you\'re trying to phase through it. Every stop you briefly taste fresh air like a prisoner.',
             effect: () => { this.loseWillpower(10); this.useSanitizer(); this.addExposure(15); }
           },
           {
             text: 'Wait for the next one (15 min)',
-            result: 'The next bus is identical. There is no\nescape. You board anyway.',
+            result: 'The next bus is identical. There is no escape. You board anyway.',
             effect: () => { this.advanceTime(15); this.losePatience(10); this.addExposure(10); }
           }
         ]
@@ -1488,16 +1490,16 @@ const Game = {
     if (bikeOnly) {
       events.push({
         title: 'EQUIPMENT FAILURE -- Flat Tire',
-        description: 'Psssssssss. Your rear tire is going flat.\nYou ran over something. A nail? A shard\nof 2020\'s collective broken dreams?',
+        description: 'Psssssssss. Your rear tire is going flat. You ran over something. A nail? A shard of 2020\'s collective broken dreams?',
         choices: [
           {
             text: 'Patch it (if you have the kit)',
-            result: 'You flip the bike, find the puncture, and\npatch it with shaking sanitizer-sticky hands.\n12 minutes on the sidewalk like a bike mechanic\nof the apocalypse.',
+            result: 'You flip the bike, find the puncture, and patch it with shaking sanitizer-sticky hands. 12 minutes on the sidewalk like a bike mechanic of the apocalypse.',
             effect: () => { this.advanceTime(12); this.losePatience(8); }
           },
           {
             text: 'Walk the bike to the next stop',
-            result: 'You push your bike like a shopping cart\nof shame. Every cyclist who passes gives\nyou a knowing nod. The brotherhood of flats.',
+            result: 'You push your bike like a shopping cart of shame. Every cyclist who passes gives you a knowing nod. The brotherhood of flats.',
             effect: () => { this.advanceTime(20); this.loseWillpower(8); }
           }
         ]
@@ -2565,9 +2567,9 @@ const Game = {
     };
 
     const r = reasons[reason];
-    this.print('<span class="danger">========================================</span>');
+    this.print(`<span class="danger">${this.separator()}</span>`);
     this.print(`<span class="danger">  ${r.title}</span>`);
-    this.print('<span class="danger">========================================</span>');
+    this.print(`<span class="danger">${this.separator()}</span>`);
     this.printLines(r.body);
     this.print('');
 
@@ -2592,9 +2594,9 @@ const Game = {
     this.clear();
     this.updateStatus();
 
-    this.print('<span class="success">========================================</span>');
-    this.print('<span class="success">       ALL ERRANDS COMPLETE</span>');
-    this.print('<span class="success">========================================</span>');
+    this.print(`<span class="success">${this.separator()}</span>`);
+    this.print('<span class="success">ALL ERRANDS COMPLETE</span>');
+    this.print(`<span class="success">${this.separator()}</span>`);
     this.print('');
     this.print('You did it. Five errands. One day.');
     this.print('');
@@ -2719,16 +2721,33 @@ const Game = {
     ];
 
     const stone = this.random(tombstones);
-    this.print('<span class="dim">+-----------------------------------+</span>');
+    const maxW = window.innerWidth < 600 ? 22 : 33;
+    const lines = [];
     stone.split('\n').forEach(line => {
-      const padded = line.padEnd(33);
-      this.print(`<span class="dim">| ${padded}   |</span>`);
+      while (line.length > maxW) {
+        let i = line.lastIndexOf(' ', maxW);
+        if (i <= 0) i = maxW;
+        lines.push(line.slice(0, i));
+        line = line.slice(i).trimStart();
+      }
+      lines.push(line);
     });
-    this.print('<span class="dim">|                                   |</span>');
-    this.print('<span class="dim">|             +===+                 |</span>');
-    this.print('<span class="dim">|             |RIP|                 |</span>');
-    this.print('<span class="dim">|             +===+                 |</span>');
-    this.print('<span class="dim">+-----------------------------------+</span>');
+    const boxW = Math.max(maxW, 5) + 4;
+    const border = '+' + '-'.repeat(boxW - 2) + '+';
+    const empty = '|' + ' '.repeat(boxW - 2) + '|';
+    const ripPad = Math.floor((boxW - 7) / 2);
+    const ripLine = '|' + ' '.repeat(ripPad) + '+===+' + ' '.repeat(boxW - 7 - ripPad) + '|';
+    const ripText = '|' + ' '.repeat(ripPad) + '|RIP|' + ' '.repeat(boxW - 7 - ripPad) + '|';
+    this.print(`<span class="dim">${border}</span>`);
+    lines.forEach(l => {
+      const padded = l.padEnd(boxW - 4);
+      this.print(`<span class="dim">| ${padded} |</span>`);
+    });
+    this.print(`<span class="dim">${empty}</span>`);
+    this.print(`<span class="dim">${ripLine}</span>`);
+    this.print(`<span class="dim">${ripText}</span>`);
+    this.print(`<span class="dim">${ripLine}</span>`);
+    this.print(`<span class="dim">${border}</span>`);
   }
 };
 
