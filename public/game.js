@@ -2734,7 +2734,22 @@ const Game = {
 
 // ─── START ───────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => Game.init());
+function startGame() {
+  if (!document.getElementById('narrative') || !document.getElementById('choices') || !document.getElementById('status-bar')) {
+    setTimeout(startGame, 50);
+    return;
+  }
+  Game.narrative = document.getElementById('narrative');
+  Game.choices = document.getElementById('choices');
+  Game.statusBar = document.getElementById('status-bar');
+  Game.init();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startGame);
+} else {
+  startGame();
+}
 
 // Keyboard support
 document.addEventListener('keydown', (e) => {
